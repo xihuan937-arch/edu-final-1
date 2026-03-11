@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="教培助手"/>
+<title>教培获客助手</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D1117;--card:#161B22;--border:#21262D;
+  --accent:#F0B429;--accent-dim:#9B7A0A;
+  --blue:#388BFD;--green:#3FB950;--red:#F85149;--purple:#BC8CFF;
+  --text:#E6EDF3;--muted:#8B949E;--dim:#484F58;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+#app{max-width:800px;margin:0 auto}
+.header{border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;background:var(--bg);z-index:10}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:52px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--accent),#E8950A);display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-title{font-weight:700;font-size:15px;font-family:'Noto Serif SC',serif}
+.logo-sub{font-size:11px;color:var(--muted);margin-left:8px}
+.status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.tabs{border-bottom:1px solid var(--border);padding:0 16px;display:flex}
+.tab{flex:1;padding:13px 8px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:-1px;transition:all .15s;font-family:inherit}
+.tab.active-content{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.active-video{color:var(--blue);border-bottom-color:var(--blue)}
+.tab.active-crm{color:var(--green);border-bottom-color:var(--green)}
+.content{padding:20px 16px 60px}
+.panel{display:none;flex-direction:column;gap:18px}
+.panel.active{display:flex}
+.label{font-size:11px;color:var(--muted);margin-bottom:7px;display:block}
+.input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border .15s}
+.input:focus{border-color:var(--accent)}
+select.input{cursor:pointer}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn{padding:10px 22px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:inherit;transition:all .15s}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-accent{background:var(--accent);color:#000}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-green{background:var(--green);color:#000}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:6px}
+.result-box{background:var(--bg);border-radius:12px;padding:18px;border:1px solid var(--border)}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.result-text{font-size:14px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:var(--text);font-family:'Noto Serif SC','PingFang SC',serif}
+.cursor::after{content:'▋';animation:blink .7s ease infinite;color:var(--accent)}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.stat-card{padding:10px 4px;border-radius:8px;cursor:pointer;text-align:center;border:1px solid var(--border);background:var(--card);transition:all .15s}
+.stat-num{font-size:20px;font-weight:700}
+.stat-label{font-size:10px;color:var(--muted);margin-top:2px}
+.toolbar{display:flex;justify-content:space-between;align-items:center}
+.lead-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+.lead-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.lead-left{display:flex;gap:12px;flex:1;min-width:0}
+.lead-avatar{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.lead-name{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.lead-meta{display:flex;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.lead-note{margin-top:5px;font-size:12px;color:var(--dim);font-style:italic}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.lead-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+.ai-box{margin-top:12px;padding:12px 14px;border-radius:8px;border:1px solid var(--accent-dim);background:rgba(240,180,41,0.05)}
+.ai-box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.form-card{background:var(--card);border:1px solid rgba(63,185,80,.27);border-radius:12px;padding:18px;margin-bottom:14px}
+.empty{text-align:center;padding:48px 0;color:var(--dim)}
+.footer{text-align:center;padding:16px;border-top:1px solid var(--border);font-size:11px;color:var(--dim)}
+@media(max-width:480px){.grid-3{grid-template-columns:1fr 1fr}.stat-label{font-size:9px}.btn-sm{padding:4px 8px;font-size:10px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">✦</div>
+        <div>
+          <span class="logo-title">教培获客助手</span>
+          <span class="logo-sub">AI驱动 · MVP</span>
+        </div>
+      </div>
+      <div class="status"><span class="dot" style="background:var(--green)"></span><span>AI 已就绪</span></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active-content" onclick="switchTab('content',this)">✏️ 招生文案</button>
+    <button class="tab" onclick="switchTab('video',this)">🎬 视频脚本</button>
+    <button class="tab" onclick="switchTab('crm',this)">👥 家长CRM</button>
+  </div>
+  <div class="content">
+    <!-- 模块1：招生文案 -->
+    <div class="panel active" id="panel-content">
+      <div><span class="label">文案类型</span><div class="chips" id="chips-type"></div></div>
+      <div><span class="label">文案风格</span><div class="chips" id="chips-tone"></div></div>
+      <div class="grid-2">
+        <div><label class="label">教学科目 *</label><input class="input" id="c-subject" placeholder="数学 / 英语 / 编程…"/></div>
+        <div><label class="label">目标年龄 *</label><input class="input" id="c-age" placeholder="小学3-5年级 / 初中…"/></div>
+      </div>
+      <div><label class="label">家长痛点（可选）</label><input class="input" id="c-pain" placeholder="孩子数学基础差、注意力不集中…"/></div>
+      <div><button class="btn btn-accent" onclick="genContent()" id="btn-content">✦ 一键生成文案</button></div>
+      <div id="result-content" style="display:none" class="result-box">
+        <div class="result-header">
+          <span style="font-size:12px;font-weight:500;color:var(--accent)">✦ AI 生成文案</span>
+          <button class="btn btn-ghost btn-sm" onclick="copyEl('out-content',this)">复制</button>
+        </div>
+        <pre class="result-text" id="out-content"></pre>
+      </div>
+    </div>
+    <!-- 模块2：视频脚本 -->
+    <div class="panel" id="panel-video">
+      <div class="grid-3">
+        <div><span class="label">发布平台</span><div class="chips" id="chips-platform"></div></div>
+        <div><span class="label">视频时长</span><div class="chips" id="chips-dur"></div></div>
+        <div><span class="label">开场风格</span><div class="chips" id="chips-hook"></div></div>
+      </div>
+      <div class="grid-2">
+        <div><label class="label">视频主题 *</label><input class="input" id="v-topic" placeholder="孩子数学从60分到120分的秘密"/></div>
+        <div><label class="label">主推课程</label><input class="input" id="v-course" placeholder="初中数学强化班"/></div>
+      </div>
+      <div><button class="btn btn-blue" onclick="genVideo()" id="btn-video">▶ 生成视频脚本</button></div>
+      <div id="result-video" style="display:none" class="result-box">
+        <div class="result-header">
+          <span style="font-size:12px;font-weight:500;color:var(--blue)" id="video-label">◈ 视频脚本</span>
+          <button class="btn btn-ghost btn-sm" onclick="copyEl('out-video',this)">复制</button>
+        </div>
+        <pre class="result-text" id="out-video"></pre>
+      </div>
+    </div>
+    <!-- 模块3：家长CRM -->
+    <div class="panel" id="panel-crm">
+      <div class="stat-grid" id="stat-grid"></div>
+      <div class="toolbar" style="margin-top:4px">
+        <span style="font-size:12px;color:var(--muted)" id="crm-count">共 3 条线索</span>
+        <button class="btn btn-green" style="padding:8px 16px;font-size:12px" onclick="openForm()">+ 添加线索</button>
+      </div>
+      <div id="form-card" style="display:none" class="form-card">
+        <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:14px" id="form-title">+ 新增线索</div>
+        <div class="grid-3" style="margin-bottom:10px">
+          <div><label class="label">家长称呼 *</label><input class="input" id="f-name" placeholder="张妈妈"/></div>
+          <div><label class="label">孩子姓名</label><input class="input" id="f-child" placeholder="张小明"/></div>
+          <div><label class="label">联系电话</label><input class="input" id="f-phone" placeholder="138****8888"/></div>
+          <div><label class="label">科目</label><input class="input" id="f-subject" placeholder="数学"/></div>
+          <div><label class="label">年级</label><input class="input" id="f-age" placeholder="初二"/></div>
+          <div><label class="label">跟进阶段</label>
+            <select class="input" id="f-stage">
+              <option>初次接触</option><option>已试听</option><option>跟进中</option><option>意向强</option><option>已报名</option>
+            </select>
+          </div>
+        </div>
+        <div><label class="label">跟进备注</label><input class="input" id="f-note" placeholder="记录沟通情况…"/></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-green" style="padding:9px 20px" onclick="saveLead()">保存</button>
+          <button class="btn btn-ghost" style="padding:9px 20px" onclick="closeForm()">取消</button>
+        </div>
+      </div>
+      <div id="lead-list"></div>
+    </div>
+  </div>
+  <div class="footer">教培获客助手 MVP · Powered by DeepSeek AI · 数据仅存于本地</div>
+</div>
+<script>
+async function callAI(prompt, onText) {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    if (!res.ok) { onText('⚠️ ' + (data.error || '请求失败')); return; }
+    onText(data.text);
+  } catch(e) { onText('⚠️ 网络错误：' + e.message); }
+}
+let selType='朋友圈招生',selTone='走心感人',selPlatform='抖音',selDur='60秒',selHook='痛点引入';
+let editId=null,crmFilter='全部',aiMsgs={};
+const SC={'初次接触':'#8B949E','已试听':'#388BFD','跟进中':'#F0B429','意向强':'#BC8CFF','已报名':'#3FB950'};
+const STAGES=['初次接触','已试听','跟进中','意向强','已报名'];
+let leads=[
+  {id:1,name:'张妈妈',child:'张小明',phone:'138****8888',subject:'数学',age:'初二',stage:'跟进中',note:'数学69分，已发过一次文案',date:'03-08'},
+  {id:2,name:'李爸爸',child:'李晓雨',phone:'139****9999',subject:'英语',age:'小学5年级',stage:'已试听',note:'试听反馈好，价格有犹豫',date:'03-09'},
+  {id:3,name:'王妈妈',child:'王浩然',phone:'135****7777',subject:'编程',age:'初一',stage:'意向强',note:'问过周末班安排',date:'03-10'},
+];
+function switchTab(id,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>{t.className='tab';});document.getElementById('panel-'+id).classList.add('active');el.classList.add('active-'+id);}
+function makeChips(cid,items,getCur,color,onSet){const el=document.getElementById(cid);el.innerHTML='';items.forEach(v=>{const b=document.createElement('button');b.className='chip';b.textContent=v;if(v===getCur())b.style.cssText='border-color:'+color+';background:'+color+'22;color:'+color;b.onclick=()=>{onSet(v);makeChips(cid,items,getCur,color,onSet);};el.appendChild(b);});}
+function initChips(){
+  makeChips('chips-type',['朋友圈招生','家长群通知','试听课邀约','暑假活动推广','成绩捷报'],()=>selType,'#F0B429',v=>{selType=v});
+  makeChips('chips-tone',['走心感人','专业权威','轻松活泼','紧迫感强','口碑推荐'],()=>selTone,'#BC8CFF',v=>{selTone=v});
+  makeChips('chips-platform',['抖音','视频号','小红书','快手'],()=>selPlatform,'#388BFD',v=>{selPlatform=v});
+  makeChips('chips-dur',['30秒','60秒','3分钟'],()=>selDur,'#3FB950',v=>{selDur=v});
+  makeChips('chips-hook',['痛点引入','数据震撼','故事开场','干货直给'],()=>selHook,'#F0B429',v=>{selHook=v});
+}
+async function runGen(prompt,outId,resultId,btnId,borderColor){
+  const outEl=document.getElementById(outId),resEl=document.getElementById(resultId),btn=document.getElementById(btnId),orig=btn.innerHTML;
+  outEl.textContent='生成中…';outEl.classList.add('cursor');resEl.style.display='block';resEl.style.borderColor=borderColor+'55';
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> 生成中…';
+  await callAI(prompt,text=>{outEl.textContent=text;});
+  outEl.classList.remove('cursor');btn.disabled=false;btn.innerHTML=orig;
+}
+async function genContent(){
+  const s=document.getElementById('c-subject').value.trim(),a=document.getElementById('c-age').value.trim(),p=document.getElementById('c-pain').value.trim();
+  if(!s||!a){alert('请填写科目和年龄段');return;}
+  await runGen('你是专业教培招生文案专家。生成一篇【'+selType+'】文案：科目：'+s+'，年龄段：'+a+'，家长痛点：'+(p||'成绩提升、升学压力')+'，风格：'+selTone+'。200字内，含emoji，结尾有行动号召。直接输出文案。','out-content','result-content','btn-content','#F0B429');
+}
+async function genVideo(){
+  const t=document.getElementById('v-topic').value.trim(),c=document.getElementById('v-course').value.trim();
+  if(!t){alert('请填写视频主题');return;}
+  document.getElementById('video-label').textContent='◈ '+selPlatform+' · '+selDur+' 脚本';
+  await runGen('你是教育短视频脚本导演。平台：'+selPlatform+'，时长：'+selDur+'，主题：'+t+'，开场风格：'+selHook+'，课程：'+(c||'教培课程')+'。创作完整脚本，用【开场0-5秒】【镜头N】标注，含画面描述+口播台词，结尾有引流动作。直接输出脚本。','out-video','result-video','btn-video','#388BFD');
+}
+function copyEl(id,btn){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{btn.textContent='✓ 已复制';setTimeout(()=>btn.textContent='复制',1800);});}
+function renderCRM(){
+  document.getElementById('stat-grid').innerHTML=STAGES.map(s=>{const cnt=leads.filter(l=>l.stage===s).length,active=crmFilter===s,c=SC[s];return '<div class="stat-card" onclick="setCRMFilter(\''+s+'\')" style="border-color:'+(active?c:'var(--border)')+';background:'+(active?c+'18':'var(--card)')+'"><div class="stat-num" style="color:'+c+'">'+cnt+'</div><div class="stat-label">'+s+'</div></div>';}).join('');
+  const shown=crmFilter==='全部'?leads:leads.filter(l=>l.stage===crmFilter);
+  document.getElementById('crm-count').textContent=crmFilter==='全部'?'共 '+leads.length+' 条线索':crmFilter+' · '+shown.length+' 条';
+  if(!shown.length){document.getElementById('lead-list').innerHTML='<div class="empty"><div style="font-size:36px;margin-bottom:10px">📋</div><div>暂无线索</div></div>';return;}
+  document.getElementById('lead-list').innerHTML=shown.map(l=>{const c=SC[l.stage],ai=aiMsgs[l.id];return '<div class="lead-card" style="border-left:3px solid '+c+'"><div class="lead-top"><div class="lead-left"><div class="lead-avatar" style="background:'+c+'22;color:'+c+'">'+l.name[0]+'</div><div style="min-width:0"><div class="lead-name"><span>'+l.name+'</span>'+(l.child?'<span style="font-size:12px;color:var(--muted)">· '+l.child+'</span>':'')+'<span class="badge" style="background:'+c+'22;color:'+c+'">'+l.stage+'</span></div><div class="lead-meta">'+(l.subject?'<span>📚 '+l.subject+'</span>':'')+(l.age?'<span>🎒 '+l.age+'</span>':'')+(l.phone?'<span>📞 '+l.phone+'</span>':'')+'<span>🗓 '+l.date+'</span></div>'+(l.note?'<div class="lead-note">💬 '+l.note+'</div>':'')+'</div></div><div class="lead-actions"><button class="btn btn-ghost btn-sm" style="color:var(--accent);border-color:var(--accent-dim)" onclick="genAI('+l.id+')" id="ai-btn-'+l.id+'">✦ AI跟进</button><button class="btn btn-ghost btn-sm" onclick="editLead('+l.id+')">编辑</button><button class="btn btn-sm" style="background:transparent;color:var(--red);border:none" onclick="delLead('+l.id+')">✕</button></div></div>'+(ai!==undefined?'<div class="ai-box"><div class="ai-box-header"><span style="font-size:11px;color:var(--accent);font-weight:500">✦ AI 跟进话术</span>'+(ai?'<button class="btn btn-ghost btn-sm" onclick="copyAI('+l.id+',this)">复制</button>':'')+'</div><p style="font-size:13px;line-height:1.8;color:var(--text)" id="ai-text-'+l.id+'">'+(ai||'生成中…')+'</p></div>':'')+'</div>';}).join('');
+}
+function setCRMFilter(s){crmFilter=crmFilter===s?'全部':s;renderCRM();}
+function openForm(){editId=null;['name','child','phone','subject','age','note'].forEach(k=>document.getElementById('f-'+k).value='');document.getElementById('f-stage').value='初次接触';document.getElementById('form-title').textContent='+ 新增线索';document.getElementById('form-card').style.display='block';}
+function closeForm(){document.getElementById('form-card').style.display='none';editId=null;}
+function editLead(id){const l=leads.find(x=>x.id===id);if(!l)return;editId=id;['name','child','phone','subject','age','note'].forEach(k=>document.getElementById('f-'+k).value=l[k]||'');document.getElementById('f-stage').value=l.stage;document.getElementById('form-title').textContent='✎ 编辑线索';document.getElementById('form-card').style.display='block';document.getElementById('form-card').scrollIntoView({behavior:'smooth'});}
+function saveLead(){const name=document.getElementById('f-name').value.trim();if(!name){alert('请填写家长称呼');return;}const now=new Date(),date=String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');const data={name,date,child:document.getElementById('f-child').value.trim(),phone:document.getElementById('f-phone').value.trim(),subject:document.getElementById('f-subject').value.trim(),age:document.getElementById('f-age').value.trim(),stage:document.getElementById('f-stage').value,note:document.getElementById('f-note').value.trim()};if(editId)leads=leads.map(l=>l.id===editId?{...l,...data}:l);else leads.push({...data,id:Date.now()});closeForm();renderCRM();}
+function delLead(id){if(!confirm('确认删除？'))return;leads=leads.filter(l=>l.id!==id);delete aiMsgs[id];renderCRM();}
+async function genAI(id){const l=leads.find(x=>x.id===id);if(!l)return;aiMsgs[id]='';renderCRM();const btn=document.getElementById('ai-btn-'+id);if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';}await callAI('你是教培招生顾问，生成一条微信跟进消息。家长：'+l.name+'，孩子：'+(l.child||'孩子')+'，科目：'+l.subject+'，年级：'+l.age+'，当前阶段：'+l.stage+'，备注：'+(l.note||'无')+'。80字内，亲切自然，结尾有行动号召。直接输出消息。',text=>{aiMsgs[id]=text;const el=document.getElementById('ai-text-'+id);if(el)el.textContent=text;});renderCRM();}
+function copyAI(id,btn){navigator.clipboard.writeText(aiMsgs[id]||'').then(()=>{btn.textContent='✓ 已复制';setTimeout(()=>btn.textContent='复制',1800);});}
+initChips();renderCRM();
+</script>
+</body>
+</html>
