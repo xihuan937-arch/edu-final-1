@@ -4,7 +4,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { messages } = req.body;
-  const key = process.env.DEEPSEEK_KEY ||‘sk-ed0600b188cc44f4a683acb0fe7ab0ed’
+  const key = process.env.DEEPSEEK_KEY ||‘sk-ed0600b188cc44f4a683acb0fe7ab0ed’；
   if (!key) return res.status(500).json({ error: '未配置 API Key' });
 
   const body = JSON.stringify({ model: 'deepseek-chat', max_tokens: 1000, messages });
